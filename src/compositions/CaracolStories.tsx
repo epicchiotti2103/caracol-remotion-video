@@ -10,8 +10,6 @@ import {
   interpolate,
 } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Inter";
-import { AnimatedText, StaggeredText } from "../components/AnimatedText";
-import { AppCard } from "../components/AppCard";
 
 const { fontFamily } = loadFont();
 
@@ -23,18 +21,144 @@ const TEXT_MUTED = "#64748b";
 const HUBSPOT_ORANGE = "#ff7a59";
 const TALENT_BLUE = "#0066ff";
 
-// Scene 1: Introduction with Logo (0-3s = frames 0-90)
+// Animation types
+type AnimationType = "fadeIn" | "fadeScale" | "slideLeft" | "rotateY" | "flip3D";
+
+// Animated Text Component
+const AnimatedText: React.FC<{
+  text: string;
+  fontSize: number;
+  fontWeight: number;
+  color: string;
+  delay?: number;
+  animation?: AnimationType;
+}> = ({ text, fontSize, fontWeight, color, delay = 0, animation = "fadeIn" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const progress = spring({
+    frame,
+    fps,
+    delay,
+    config: { damping: 200 },
+  });
+
+  let style: React.CSSProperties = {
+    fontSize,
+    fontWeight,
+    color,
+    textAlign: "center",
+  };
+
+  switch (animation) {
+    case "fadeIn":
+      style.opacity = progress;
+      break;
+    case "fadeScale":
+      style.opacity = progress;
+      style.transform = `scale(${interpolate(progress, [0, 1], [0.8, 1])})`;
+      break;
+    case "slideLeft":
+      style.opacity = progress;
+      style.transform = `translateX(${interpolate(progress, [0, 1], [100, 0])}px)`;
+      break;
+    case "rotateY":
+      style.opacity = progress;
+      style.transform = `perspective(1000px) rotateY(${interpolate(progress, [0, 1], [-45, 0])}deg)`;
+      break;
+    case "flip3D":
+      style.opacity = progress;
+      style.transform = `perspective(1000px) rotateX(${interpolate(progress, [0, 1], [90, 0])}deg)`;
+      break;
+  }
+
+  return <div style={style}>{text}</div>;
+};
+
+// Staggered Text Component
+const StaggeredText: React.FC<{
+  lines: string[];
+  fontSize: number;
+  fontWeight: number;
+  color: string;
+  baseDelay?: number;
+  staggerDelay?: number;
+  animation?: AnimationType;
+}> = ({ lines, fontSize, fontWeight, color, baseDelay = 0, staggerDelay = 10, animation = "fadeIn" }) => {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      {lines.map((line, index) => (
+        <AnimatedText
+          key={index}
+          text={`• ${line}`}
+          fontSize={fontSize}
+          fontWeight={fontWeight}
+          color={color}
+          delay={baseDelay + index * staggerDelay}
+          animation={animation}
+        />
+      ))}
+    </div>
+  );
+};
+
+// App Card Component
+const AppCard: React.FC<{
+  icon: string;
+  label: string;
+  delay?: number;
+  color?: string;
+}> = ({ icon, label, delay = 0, color = "#3b82f6" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const progress = spring({
+    frame,
+    fps,
+    delay,
+    config: { damping: 15, stiffness: 120 },
+  });
+
+  const scale = interpolate(progress, [0, 1], [0, 1]);
+  const opacity = progress;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 8,
+        opacity,
+        transform: `scale(${scale})`,
+      }}
+    >
+      <div
+        style={{
+          width: 80,
+          height: 80,
+          borderRadius: 20,
+          backgroundColor: color,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 36,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+        }}
+      >
+        {icon}
+      </div>
+      <span style={{ fontSize: 14, fontWeight: 500, color: TEXT_MUTED }}>{label}</span>
+    </div>
+  );
+};
+
+// Scene 1: Introduction with Logo (0-3s)
 const Scene1Intro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const logoScale = spring({
-    frame,
-    fps,
-    config: { damping: 200 },
-  });
-
-  const logoOpacity = spring({
+  const logoProgress = spring({
     frame,
     fps,
     config: { damping: 200 },
@@ -55,13 +179,13 @@ const Scene1Intro: React.FC = () => {
       {/* Logo */}
       <div
         style={{
-          opacity: logoOpacity,
-          transform: `scale(${interpolate(logoScale, [0, 1], [0.5, 1])})`,
+          opacity: logoProgress,
+          transform: `scale(${interpolate(logoProgress, [0, 1], [0.5, 1])})`,
           marginBottom: 60,
         }}
       >
         <Img
-          src={staticFile("logo-caracol.jpeg")}
+          src={staticFile("logo-caracol.jpg")}
           style={{
             width: 280,
             height: 280,
@@ -85,7 +209,7 @@ const Scene1Intro: React.FC = () => {
       {/* Subtitle */}
       <div style={{ marginTop: 24 }}>
         <AnimatedText
-          text="Automacao de vendas &"
+          text="Automação de vendas &"
           fontSize={36}
           fontWeight={500}
           color={TEXT_SECONDARY}
@@ -107,7 +231,7 @@ const Scene1Intro: React.FC = () => {
   );
 };
 
-// Scene 2: HubSpot Partner (3-7s = frames 90-210)
+// Scene 2: HubSpot Partner (3-7s)
 const Scene2HubSpot: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -173,8 +297,8 @@ const Scene2HubSpot: React.FC = () => {
       <div style={{ marginTop: 50, width: "100%" }}>
         <StaggeredText
           lines={[
-            "Implementacao completa",
-            "Automacao de marketing",
+            "Implementação completa",
+            "Automação de marketing",
             "Crescimento de receita",
           ]}
           fontSize={32}
@@ -189,7 +313,7 @@ const Scene2HubSpot: React.FC = () => {
   );
 };
 
-// Scene 3: Talent.com + Apps (7-11s = frames 210-330)
+// Scene 3: Talent.com + Apps (7-11s)
 const Scene3Talent: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -281,7 +405,7 @@ const Scene3Talent: React.FC = () => {
   );
 };
 
-// Scene 4: CTA Final (11-13s = frames 330-390)
+// Scene 4: CTA Final (11-12s)
 const Scene4CTA: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -296,7 +420,7 @@ const Scene4CTA: React.FC = () => {
   // Fade out at the end
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - 30, durationInFrames],
+    [durationInFrames - 15, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -322,7 +446,7 @@ const Scene4CTA: React.FC = () => {
         }}
       >
         <Img
-          src={staticFile("logo-caracol.jpeg")}
+          src={staticFile("logo-caracol.jpg")}
           style={{
             width: 160,
             height: 160,
@@ -339,7 +463,7 @@ const Scene4CTA: React.FC = () => {
         fontSize={56}
         fontWeight={700}
         color={TEXT_PRIMARY}
-        delay={10}
+        delay={5}
         animation="flip3D"
       />
 
@@ -349,7 +473,7 @@ const Scene4CTA: React.FC = () => {
           fontSize={44}
           fontWeight={600}
           color={HUBSPOT_ORANGE}
-          delay={20}
+          delay={12}
           animation="flip3D"
         />
       </div>
@@ -361,7 +485,7 @@ const Scene4CTA: React.FC = () => {
           fontSize={28}
           fontWeight={500}
           color={TEXT_MUTED}
-          delay={35}
+          delay={20}
           animation="fadeIn"
         />
       </div>
@@ -369,29 +493,29 @@ const Scene4CTA: React.FC = () => {
   );
 };
 
-// Main Composition
+// Main Composition - 12 seconds, 30fps, 1080x1920
 export const CaracolStories: React.FC = () => {
   const { fps } = useVideoConfig();
 
   return (
     <AbsoluteFill style={{ backgroundColor: BG_LIGHT }}>
       {/* Scene 1: 0-3s (frames 0-90) */}
-      <Sequence from={0} durationInFrames={3 * fps} premountFor={fps}>
+      <Sequence from={0} durationInFrames={3 * fps}>
         <Scene1Intro />
       </Sequence>
 
       {/* Scene 2: 3-7s (frames 90-210) */}
-      <Sequence from={3 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      <Sequence from={3 * fps} durationInFrames={4 * fps}>
         <Scene2HubSpot />
       </Sequence>
 
       {/* Scene 3: 7-11s (frames 210-330) */}
-      <Sequence from={7 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      <Sequence from={7 * fps} durationInFrames={4 * fps}>
         <Scene3Talent />
       </Sequence>
 
-      {/* Scene 4: 11-13s (frames 330-390) */}
-      <Sequence from={11 * fps} durationInFrames={2 * fps} premountFor={fps}>
+      {/* Scene 4: 11-12s (frames 330-360) */}
+      <Sequence from={11 * fps} durationInFrames={1 * fps}>
         <Scene4CTA />
       </Sequence>
     </AbsoluteFill>
