@@ -1,0 +1,22 @@
+{
+  "name": "caracol-remotion-video",
+  "version": "1.0.0",
+  "description": "Caracol Media - Videos with Remotion",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render CaracolStories out/caracol-stories.mp4",
+    "render": "remotion render",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.242",
+    "@remotion/google-fonts": "4.0.242",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.242"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
