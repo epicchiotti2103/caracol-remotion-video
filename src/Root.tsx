@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { CaracolStories } from "./CaracolStories";
 import { SalesMachineIntro } from "./SalesMachineIntro";
+import { CasamentoFabioPattyInvite, TOTAL_DURATION as WEDDING_DURATION } from "./CasamentoFabioPattyInvite";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -20,6 +21,16 @@ export const RemotionRoot: React.FC = () => {
         id="SalesMachineIntro"
         component={SalesMachineIntro}
         durationInFrames={1200}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* Casamento Fabio & Patty - Wedding Invitation Video */}
+      <Composition
+        id="CasamentoFabioPattyInvite"
+        component={CasamentoFabioPattyInvite}
+        durationInFrames={WEDDING_DURATION}
         fps={30}
         width={1080}
         height={1920}
