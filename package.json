@@ -1,0 +1,31 @@
+{
+  "name": "caracol-remotion-video",
+  "version": "1.0.0",
+  "description": "Remotion project for Caracol Media videos",
+  "type": "module",
+  "scripts": {
+    "start": "remotion studio",
+    "preview": "remotion studio",
+    "build": "remotion bundle",
+    "render": "remotion render CaracolMediaTest out/video.mp4",
+    "render:gif": "remotion render CaracolMediaTest out/video.gif",
+    "upgrade": "remotion upgrade"
+  },
+  "keywords": [
+    "remotion",
+    "video",
+    "caracol-media"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@remotion/bundler": "^4.0.409",
+    "@remotion/cli": "^4.0.409",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "remotion": "^4.0.409",
+    "typescript": "^5.9.3"
+  }
+}
