@@ -4,7 +4,9 @@
   "description": "Caracol Media - Premium institutional video",
   "scripts": {
     "start": "remotion studio",
-    "build": "remotion render CaracolStories out/video.mp4",
+    "build": "remotion render CorporateVideo out/caracol-corporate.mp4",
+    "build:stories": "remotion render CaracolStories out/caracol-stories.mp4",
+    "build:all": "npm run build && npm run build:stories",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
